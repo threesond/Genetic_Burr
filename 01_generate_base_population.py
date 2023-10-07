@@ -46,7 +46,7 @@ while True:
     output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
     output = output.split(' ')
     if output[3] != '0':
-        save_name = os.path.join('./population', f'{validated_size}.xml')
+        save_name = os.path.join('./ori_population', f'{validated_size}.xml')
         tree.write(save_name)
         validated_size += 1
         print(validated_size / population_size * 100)

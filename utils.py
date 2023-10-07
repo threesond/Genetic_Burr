@@ -1,6 +1,7 @@
 import numpy as np
-from random import sample
+from random import sample, choice
 from unionfind import unionfind
+import xml.etree.ElementTree as ET
 
 voxel_dict = {
     '#': 1,
@@ -13,11 +14,6 @@ array_dict = {
     0: '_',
     2: '+'
 }
-
-kernel = np.zeros([3,3,3], dtype=int)
-kernel[0] = np.array([[0,0,0],[0,1,0],[0,0,0]])
-kernel[1] = np.array([[0,1,0],[1,0,1],[0,1,0]])
-kernel[2] = np.array([[0,0,0],[0,1,0],[0,0,0]])
 
 def string_to_array(input_shape_string, input_shape_sizes):
     """A simple function to convert burr-tools xml voxel shape string to numpy array
@@ -72,6 +68,16 @@ def validate_shape(input_voxel_array):
         return False
     elif len(u.groups()) == 1:
         return True
+    
+def validate_shape_by_string(input_voxel_string, input_shape_size):
+    """validate the shape by input string
+
+    Args:
+        input_voxel_string (str): input voxel string
+        input_shape_size (tuple): the input shape size
+    """
+    input_voxel_array = string_to_array(input_voxel_string, input_shape_size)
+    return validate_shape(input_voxel_array)
 
 def find_valid_shape_by_string(input_voxel_string, 
                                 input_voxel_shape, 
@@ -90,10 +96,6 @@ def find_valid_shape_by_string(input_voxel_string,
         if validation:
             break
     return base_shape_candidate
-
-
-
-
     
 def generate_base_shape(template_shape, voxel_num):
     """generate a base shape by random sampling the viable voxels
@@ -112,3 +114,79 @@ def generate_base_shape(template_shape, voxel_num):
     template_shape[sampled_pos] = 1
     template_shape.shape = ori_shape
     return template_shape
+
+def crossover(xml_a, xml_b, template_xml):
+    """make a crossover os parent xmls
+
+    Args:
+        xml_a (xml tree): parent a
+        xml_b (xml tree): parent b
+        template_xml (str): template xml file
+    """
+    root_a = xml_a.getroot()
+    root_b = xml_b.getroot()
+    template_tree = ET.parse(template_xml)
+    template_root = template_tree.getroot()
+    for voxel_a, voxel_b, voxel_template in zip(root_a.iter('voxel'), root_b.iter('voxel'), template_root.iter('voxel')):
+        voxel_a_dict = voxel_a.attrib
+        voxel_a_string = list(voxel_a.text)
+        voxel_b_string = list(voxel_b.text)
+        z = int(voxel_a_dict['z'])
+        y = int(voxel_a_dict['y'])
+        x = int(voxel_a_dict['x'])
+        name = voxel_a_dict['name']
+        if name != 'Goal':
+            while True:
+                crosspoint = np.random.randint(len(voxel_a_string))
+                t_string = voxel_a_string
+                t_string[crosspoint:] = voxel_b_string[crosspoint:]
+                voxel_template.text = ''.join(t_string)
+                if validate_shape_by_string(voxel_template.text, (z,y,x)):
+                    break
+    return template_tree
+
+def mutation(xml, template_xml):
+    """make a mutation to the voxel by adding or removing a voxel randomly
+
+    Args:
+        xml (xml tree): the input candidate
+    """
+    root = xml.getroot()
+    template_tree = ET.parse(template_xml)
+    template_root = template_tree.getroot()
+    for voxel, voxel_template in zip(root.iter('voxel'), template_root.iter('voxel')):
+        voxel_string = voxel.text
+        voxel_dict = voxel.attrib
+        oz = int(voxel_dict['z'])
+        oy = int(voxel_dict['y'])
+        ox = int(voxel_dict['x'])
+        name = voxel_dict['name']
+        if name != 'Goal':
+            voxel_array = string_to_array(voxel_string, (oz,oy,ox))
+            while True:
+                pos = np.argwhere(voxel_array == 1)
+                t_voxel_array = voxel_array.copy()
+                pos = [tuple(x) for x in pos]
+                t_pos = choice(pos)
+                z,y,x = t_pos
+                if np.random.uniform(0,1)<0.5:
+                    t_voxel_array[z,y,x] = 0
+                else:
+                    mode = np.random.randint(6)
+                    if mode == 0:
+                        t_voxel_array[z,y,x-1] = 1
+                    if mode == 1:
+                        t_voxel_array[z,y,np.minimum(x+1,ox-1)] = 1
+                    if mode == 2:
+                        t_voxel_array[z,y-1,x] = 1
+                    if mode == 3:
+                        t_voxel_array[z,np.minimum(y+1,oy-1),x] = 1
+                    if mode == 4:
+                        t_voxel_array[z-1,y,x] = 1
+                    if mode == 5:
+                        t_voxel_array[np.minimum(z+1,oz-1),y,x] = 1
+                t_string = array_to_string(t_voxel_array)
+                if validate_shape_by_string(''.join(t_string), (oz,oy,ox)):
+                    voxel_template.text = ''.join(t_string)
+                    break
+    return template_tree
