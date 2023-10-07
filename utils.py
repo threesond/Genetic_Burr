@@ -72,7 +72,25 @@ def validate_shape(input_voxel_array):
         return False
     elif len(u.groups()) == 1:
         return True
-        
+
+def find_valid_shape_by_string(input_voxel_string, 
+                                input_voxel_shape, 
+                                additional_size):
+    """find a valid shape by randomly sample the input voxel template
+
+    Args:
+        input_voxel_string (str): the input shape template
+        input_voxel_shape (tuple): the input shape
+        additional_size(int): the additional voxel size
+    """
+    voxel_array = string_to_array(input_voxel_string, input_voxel_shape)
+    while True:
+        base_shape_candidate = generate_base_shape(voxel_array, additional_size)
+        validation = validate_shape(base_shape_candidate)
+        if validation:
+            break
+    return base_shape_candidate
+
 
 
 
