@@ -50,7 +50,7 @@ while True:
         parent_xmls.append(xml_list[index])
 
     ### now make 900 crossovers
-    offsrping_number = 900
+    offsrping_number = 800
     offspring_size = 0
     offspring_list = []
     while True:
@@ -69,6 +69,7 @@ while True:
             print(offspring_size / offsrping_number * 100)
 
     ### now make 100 mutations
+    mutation_number = 200
     mutation_size = 0
     mutation_list = []
     while True:
@@ -81,9 +82,9 @@ while True:
             print(output)
             mutation_list.append(xml)
             mutation_size += 1
-            if mutation_size > 100:
+            if mutation_size > mutation_number:
                 break
-            print(mutation_size / 100 * 100)
+            print(mutation_size / mutation_number * 100)
 
     fitness_list = []
     xml_list = elite_xmls + offspring_list + mutation_list

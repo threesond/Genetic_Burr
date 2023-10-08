@@ -14,7 +14,7 @@ minimum_size_dict = {
     'A': 5,
     'B': 5
 }
-additional_size = 5
+additional_size = 10
 population_size = 1000
 
 validated_size = 0
