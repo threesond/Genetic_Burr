@@ -190,3 +190,21 @@ def mutation(xml, template_xml):
                     voxel_template.text = ''.join(t_string)
                     break
     return template_tree
+
+def find_size_by_name(xml, shape_name):
+    """find the frame size by name
+
+    Args:
+        xml (xml): the input xml tree
+    """
+    root = xml.getroot()
+    for voxel in root.iter('voxel'):
+        voxel_dict = voxel.attrib
+        name = voxel_dict['name']
+        oz = int(voxel_dict['z'])
+        oy = int(voxel_dict['y'])
+        ox = int(voxel_dict['x'])
+        if name == shape_name:
+            voxel_string = voxel.text
+            voxel_array = string_to_array(voxel_string, (oz, oy, ox))
+            return np.sum(voxel_array)

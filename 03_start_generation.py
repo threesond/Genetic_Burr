@@ -4,13 +4,15 @@ from tqdm import tqdm
 import os
 import numpy as np
 import xml.etree.ElementTree as ET
-from random import choice
-from utils import crossover, mutation
+from random import choices
+from utils import crossover, mutation, find_size_by_name
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--Template", help="the template path")
 
 args = argParser.parse_args()
+
+### using more resonable genetic algorithms to generate pieces
 
 xml_files = glob('./ori_population/*.xml')
 xml_list = []
@@ -20,9 +22,6 @@ for xml_file in tqdm(xml_files):
 
 print(len(xml_files))
 
-### first generate the fitness
-### fitness is the total moves of the solution
-
 fitness_list = []
 for tree in tqdm(xml_list):
     tree.write('./temp.xml')
@@ -31,9 +30,9 @@ for tree in tqdm(xml_list):
     levels = output[-1].split('\n')[1:-2]
     levels = [x.replace('level: ','') for x in levels]
     levels = [sum([int(y) for y in x.split('.')]) for x in levels]
-    # fitness = max(levels)
-    fitness = np.mean(levels)
+    fitness = np.mean(levels) + find_size_by_name(tree, 'Frame')
     fitness_list.append(fitness)
+
 fitness_list = np.array(fitness_list)
 iteration = 0
 while True:
@@ -49,20 +48,16 @@ while True:
     ### save the first elite
     elite_xmls[0].write(f'./results/{iteration}.xml')
     ### keep half of the xmls as parents
-    xml_size = len(xml_list)
-    keep_size = int(xml_size/10)
-    parent_xmls = []
-    for index in sort_indexs[:keep_size]:
-        parent_xmls.append(xml_list[index])
 
-    ### now make 900 crossovers
+    prob = fitness_list/np.sum(fitness_list)
+
     offsrping_number = 990
     offspring_size = 0
     offspring_list = []
     while True:
-        parent_a = choice(parent_xmls)
-        parent_b = choice(parent_xmls)
-        xml = crossover(parent_a, parent_b, args.Template)
+        parent_a = choices(xml_list, weights=prob, k=1)
+        parent_b = choices(xml_list, weights=prob, k=1)
+        xml = crossover(parent_a[0], parent_b[0], args.Template)
         xml.write('./temp.xml')
         output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
         output = output.split(' ')
@@ -73,24 +68,6 @@ while True:
             if offspring_size > offsrping_number:
                 break
             print(offspring_size / offsrping_number * 100)
-
-    ### now make 100 mutations
-    # mutation_number = 500
-    # mutation_size = 0
-    # mutation_list = []
-    # while True:
-    #     condidate = choice(parent_xmls)
-    #     xml = mutation(condidate, args.Template)
-    #     xml.write('./temp.xml')
-    #     output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
-    #     output = output.split(' ')
-    #     if output[3] != '0' and output[3] != 'be':
-    #         print(output)
-    #         mutation_list.append(xml)
-    #         mutation_size += 1
-    #         if mutation_size > mutation_number:
-    #             break
-    #         print(mutation_size / mutation_number * 100)
 
     for i in tqdm(range(len(offspring_list))):
         if np.random.uniform(0,1) < 0.2:
@@ -105,8 +82,10 @@ while True:
                     offspring_list[i] = xml
                     break
 
+
     fitness_list = []
     xml_list = elite_xmls + offspring_list
+    level_list = []
     for tree in tqdm(xml_list):
         tree.write('./temp.xml')
         output = os.popen(f'./bin/burrTxt -d ./temp.xml').read()
@@ -115,7 +94,8 @@ while True:
         levels = [x.replace('level: ','') for x in levels]
         levels = [sum([int(y) for y in x.split('.')]) for x in levels]
         # fitness = max(levels)
-        fitness = np.mean(levels)
+        fitness = np.mean(levels) + find_size_by_name(tree, 'Frame')
+        level_list.append(np.mean(levels))
         fitness_list.append(fitness)
     with open('./logs.txt' ,'a') as f:
-        f.write(f'current max levels: {max(fitness_list)}\n')
+        f.write(f'current max levels: {max(level_list)}\n')
