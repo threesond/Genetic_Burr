@@ -30,7 +30,7 @@ for tree in tqdm(xml_list):
     levels = output[-1].split('\n')[1:-2]
     levels = [x.replace('level: ','') for x in levels]
     levels = [sum([int(y) for y in x.split('.')]) for x in levels]
-    fitness = np.mean(levels) + find_size_by_name(tree, 'Frame')
+    fitness = np.mean(levels)
     fitness_list.append(fitness)
 
 fitness_list = np.array(fitness_list)
@@ -85,7 +85,6 @@ while True:
 
     fitness_list = []
     xml_list = elite_xmls + offspring_list
-    level_list = []
     for tree in tqdm(xml_list):
         tree.write('./temp.xml')
         output = os.popen(f'./bin/burrTxt -d ./temp.xml').read()
@@ -94,8 +93,7 @@ while True:
         levels = [x.replace('level: ','') for x in levels]
         levels = [sum([int(y) for y in x.split('.')]) for x in levels]
         # fitness = max(levels)
-        fitness = np.mean(levels) + find_size_by_name(tree, 'Frame')
-        level_list.append(np.mean(levels))
+        fitness = np.mean(levels)
         fitness_list.append(fitness)
     with open('./logs.txt' ,'a') as f:
-        f.write(f'current max levels: {max(level_list)}\n')
+        f.write(f'current max levels: {max(fitness_list)}\n')

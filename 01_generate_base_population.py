@@ -17,10 +17,11 @@ args = argParser.parse_args()
 # set minimum needed voxel size for each shape
 minimum_size_dict = {
     'Frame': 0,
-    'A': 5,
-    'B': 5
+    'A': 9,
+    'B': 9
 }
-additional_size = 10
+additional_size = 9
+frame_additional_size = 9
 population_size = 1000
 
 validated_size = 0
@@ -40,7 +41,10 @@ while True:
         name = voxel_dict['name']
         if name != 'Goal':
             minimum_size = minimum_size_dict[name]
-            required_size = minimum_size + np.random.randint(1, additional_size)
+            if name == 'Frame':
+                required_size = np.random.randint(0, frame_additional_size)
+            else:
+                required_size = np.random.randint(0, additional_size)
             new_shape = find_valid_shape_by_string(
                 voxel_string,
                 (z,y,x),
