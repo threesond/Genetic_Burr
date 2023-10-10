@@ -33,8 +33,9 @@ def array_to_string(input_shape_array):
     Args:
         input_shape_array (numpy array): the input shape array
     """
-    input_shape_array.shape = (-1)
-    input_shape_list = list(input_shape_array)
+    shape_array = input_shape_array.copy()
+    shape_array.shape = (-1)
+    input_shape_list = list(shape_array)
     input_shape_list = [array_dict[x] for x in input_shape_list]
     return ''.join(input_shape_list)
 
@@ -167,24 +168,26 @@ def mutation(xml, template_xml):
                 pos = np.argwhere(voxel_array == 1)
                 t_voxel_array = voxel_array.copy()
                 pos = [tuple(x) for x in pos]
-                t_pos = choice(pos)
-                z,y,x = t_pos
-                if np.random.uniform(0,1)<0.5:
-                    t_voxel_array[z,y,x] = 0
-                else:
-                    mode = np.random.randint(6)
-                    if mode == 0:
-                        t_voxel_array[z,y,x-1] = 1
-                    if mode == 1:
-                        t_voxel_array[z,y,np.minimum(x+1,ox-1)] = 1
-                    if mode == 2:
-                        t_voxel_array[z,y-1,x] = 1
-                    if mode == 3:
-                        t_voxel_array[z,np.minimum(y+1,oy-1),x] = 1
-                    if mode == 4:
-                        t_voxel_array[z-1,y,x] = 1
-                    if mode == 5:
-                        t_voxel_array[np.minimum(z+1,oz-1),y,x] = 1
+                mutation_times = np.random.randint(1,2)
+                for _ in range(mutation_times):
+                    t_pos = choice(pos)
+                    z,y,x = t_pos
+                    if np.random.uniform(0,1)<0.5:
+                        t_voxel_array[z,y,x] = 0
+                    else:
+                        mode = np.random.randint(6)
+                        if mode == 0:
+                            t_voxel_array[z,y,x-1] = 1
+                        if mode == 1:
+                            t_voxel_array[z,y,np.minimum(x+1,ox-1)] = 1
+                        if mode == 2:
+                            t_voxel_array[z,y-1,x] = 1
+                        if mode == 3:
+                            t_voxel_array[z,np.minimum(y+1,oy-1),x] = 1
+                        if mode == 4:
+                            t_voxel_array[z-1,y,x] = 1
+                        if mode == 5:
+                            t_voxel_array[np.minimum(z+1,oz-1),y,x] = 1
                 t_string = array_to_string(t_voxel_array)
                 if validate_shape_by_string(''.join(t_string), (oz,oy,ox)):
                     voxel_template.text = ''.join(t_string)

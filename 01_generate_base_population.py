@@ -20,8 +20,8 @@ minimum_size_dict = {
     'A': 9,
     'B': 9
 }
-additional_size = 9
-frame_additional_size = 9
+additional_size = 2
+frame_additional_size = 2
 population_size = 1000
 
 validated_size = 0
