@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<puzzle version="2">
+ <gridType type="0"/>
+ <colors/>
+ <shapes>
+  <voxel x="5" y="5" z="5" name="Frame" type="0">######+++##+++##+++#######___#_+++__+++__+++_#___##___#_+++__+++__+++_#___##___#_+++__+++__+++_#___#######+++##+++##+++######</voxel>
+  <voxel x="5" y="5" z="5" name="Goal" type="0">######+++##+++##+++############+++##+++##+++############+++##+++##+++############+++##+++##+++############+++##+++##+++######</voxel>
+  <voxel x="5" y="3" z="3" name="A" type="0">#+++##+++##+++##+++##+++##+++##+++##+++##+++#</voxel>
+  <voxel x="5" y="3" z="3" name="B" type="0">#+++##+++##+++##+++##+++##+++##+++##+++##+++#</voxel>
+ </shapes>
+ <problems>
+  <problem state="0">
+   <shapes>
+    <shape id="0" count="1"/>
+    <shape id="2" count="1"/>
+    <shape id="3" count="1"/>
+   </shapes>
+   <result id="1"/>
+   <bitmap/>
+  </problem>
+ </problems>
+ <comment/>
+</puzzle>

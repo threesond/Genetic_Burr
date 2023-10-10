@@ -17,11 +17,11 @@ args = argParser.parse_args()
 # set minimum needed voxel size for each shape
 minimum_size_dict = {
     'Frame': 0,
-    'A': 9,
-    'B': 9
+    'A': 3,
+    'B': 3
 }
-additional_size = 2
-frame_additional_size = 2
+additional_size = 6
+frame_additional_size = 1
 population_size = 1000
 
 validated_size = 0
@@ -42,9 +42,9 @@ while True:
         if name != 'Goal':
             minimum_size = minimum_size_dict[name]
             if name == 'Frame':
-                required_size = np.random.randint(0, frame_additional_size)
+                required_size = np.random.randint(0, frame_additional_size) + minimum_size
             else:
-                required_size = np.random.randint(0, additional_size)
+                required_size = np.random.randint(0, additional_size) + minimum_size
             new_shape = find_valid_shape_by_string(
                 voxel_string,
                 (z,y,x),
@@ -57,7 +57,7 @@ while True:
 
     output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
     output = output.split(' ')
-    if output[3] != '0' and output[3] != 'be' and output[3] != 'few':
+    if output[3] != '0' and output[3] != 'be' and output[3] != 'few' and output[3] != 'many':
         save_name = os.path.join('./ori_population', f'{validated_size}.xml')
         tree.write(save_name)
         validated_size += 1

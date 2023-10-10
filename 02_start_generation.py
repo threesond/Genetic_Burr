@@ -77,7 +77,7 @@ while True:
                 xml.write('./temp.xml')
                 output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
                 output = output.split(' ')
-                if output[3] != '0' and output[3] != 'be':
+                if output[3] != '0' and output[3] != 'be' and output[3] != 'many':
                     print(output)
                     offspring_list[i] = xml
                     break
