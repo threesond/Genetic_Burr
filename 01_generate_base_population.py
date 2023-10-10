@@ -5,28 +5,22 @@ from scipy import ndimage
 from utils import array_to_string, find_valid_shape_by_string, generate_base_shape, string_to_array, validate_shape
 import os
 import re
+from random import sample
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--Template", help="the template path")
 
 args = argParser.parse_args()
-
-### first we generate the base population for later use in the genetic algorithm
-### all the piece should be valid, that is, they should be all connected shape
-
-# set minimum needed voxel size for each shape
-minimum_size_dict = {
-    'Frame': 0,
-    'A': 9,
-    'B': 9
-}
-additional_size = 2
-frame_additional_size = 2
 population_size = 1000
-
 validated_size = 0
 
-
+basename = os.path.basename(args.Template)
+basename = basename.replace('.xml','')
+npz_path = os.path.join('./shapes', f'{basename}.npz')
+pieces_dict = np.load(npz_path, allow_pickle=True)
+pieces_dict = dict(pieces_dict)
+for key in pieces_dict:
+    pieces_dict[key] = list(pieces_dict[key])
 
 while True:
     input_puzzle_template_file = args.Template
@@ -40,18 +34,9 @@ while True:
         voxel_string = voxel.text
         name = voxel_dict['name']
         if name != 'Goal':
-            minimum_size = minimum_size_dict[name]
-            if name == 'Frame':
-                required_size = np.random.randint(0, frame_additional_size)
-            else:
-                required_size = np.random.randint(0, additional_size)
-            new_shape = find_valid_shape_by_string(
-                voxel_string,
-                (z,y,x),
-                required_size
-            )
-            new_voxel_string = array_to_string(new_shape)
-            voxel.text = new_voxel_string
+            sample_string = sample(pieces_dict[name], k=1)
+            new_shape_string = sample_string[0]
+            voxel.text = new_shape_string
 
     tree.write('./temp.xml')
 

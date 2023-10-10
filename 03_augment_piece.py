@@ -49,25 +49,3 @@ for voxel in root.iter('voxel'):
                 save_name = os.path.join('./aug_results','result.xml')
                 tree.write(save_name)
                 voxel_array = t_voxel_array.copy()
-
-
-        
-        
-        while True:
-            
-            z,y,x = t_pos
-            voxel_array[z,y,x] = 1
-            t_string = array_to_string(voxel_array)
-            if validate_shape_by_string(''.join(t_string), (oz,oy,ox)):
-                voxel.text = ''.join(t_string)
-                tree.write('./temp.xml')
-                output = os.popen(f'./bin/burrTxt -d ./temp.xml').read()
-                output = output.split('-------------------------------------------------------')
-                levels = output[-1].split('\n')[1:-2]
-                levels = [x.replace('level: ','') for x in levels]
-                levels = [sum([int(y) for y in x.split('.')]) for x in levels]
-                fitness = np.mean(levels)
-                if fitness >= args.Steps:
-                    print('augmented 1')
-                    save_name = os.path.join('./aug_results','result.xml')
-                    tree.write(save_name)

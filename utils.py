@@ -146,6 +146,47 @@ def crossover(xml_a, xml_b, template_xml):
                     break
     return template_tree
 
+def grow_shape(input_shape_array):
+    """mutate shape until it's not valid
+
+    Args:
+        input_shape_array (numpy array): the array of the shape
+    """
+    prev_array = input_shape_array.copy()
+    oz,oy,ox = input_shape_array.shape
+    current_valid_shape_string = ''
+    while True:
+        current_array = prev_array.copy()
+        pos = np.argwhere(current_array == 1)
+        pos = [tuple(x) for x in pos]
+        t_pos = choice(pos)
+        z,y,x = t_pos
+        if np.random.uniform(0,1)<0.5:
+            current_array[z,y,x] = 0
+        else:
+            mode = np.random.randint(6)
+            if mode == 0:
+                current_array[z,y,x-1] = 1
+            if mode == 1:
+                current_array[z,y,np.minimum(x+1,ox-1)] = 1
+            if mode == 2:
+                current_array[z,y-1,x] = 1
+            if mode == 3:
+                current_array[z,np.minimum(y+1,oy-1),x] = 1
+            if mode == 4:
+                current_array[z-1,y,x] = 1
+            if mode == 5:
+                current_array[np.minimum(z+1,oz-1),y,x] = 1
+        t_string = array_to_string(current_array)
+        if validate_shape_by_string(''.join(t_string), (oz,oy,ox)):
+            current_valid_shape_string = t_string
+            prev_array = current_array
+        else:
+            return current_valid_shape_string
+
+
+
+
 def mutation(xml, template_xml):
     """make a mutation to the voxel by adding or removing a voxel randomly
 
