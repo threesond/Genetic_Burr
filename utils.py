@@ -168,7 +168,7 @@ def mutation(xml, template_xml):
                 pos = np.argwhere(voxel_array == 1)
                 t_voxel_array = voxel_array.copy()
                 pos = [tuple(x) for x in pos]
-                mutation_times = np.random.randint(1,3)
+                mutation_times = np.random.randint(1,5)
                 for _ in range(mutation_times):
                     t_pos = choice(pos)
                     z,y,x = t_pos

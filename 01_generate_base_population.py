@@ -17,11 +17,12 @@ args = argParser.parse_args()
 # set minimum needed voxel size for each shape
 minimum_size_dict = {
     'Frame': 0,
-    'A': 3,
-    'B': 3
+    'A': 0,
+    'B': 0,
+    'C': 0
 }
-additional_size = 6
-frame_additional_size = 1
+additional_size = 56
+frame_additional_size = 5
 population_size = 1000
 
 validated_size = 0
