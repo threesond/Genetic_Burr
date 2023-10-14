@@ -70,6 +70,46 @@ def validate_shape(input_voxel_array):
     elif len(u.groups()) == 1:
         return True
     
+def validate_shape(input_voxel_array, return_suitable_shape=False):
+    """validate voxel shape, make sure the voxels in the shape is all connected by utilizing union find algorithm
+
+    Args:
+        input_voxel_array (numpy array): the input shape in numpy array
+    """
+    
+    pos = np.argwhere(input_voxel_array == 1)
+    pos = [tuple(x) for x in pos]
+    pos_dict = {item:ind for ind, item in enumerate(pos)}
+    u = unionfind(len(pos))
+    for t_pos in pos:
+        z,y,x = t_pos
+        if (z,y,x+1) in pos_dict:
+            u.unite(pos_dict[t_pos], pos_dict[(z,y,x+1)])
+        if (z,y,x-1) in pos_dict:
+            u.unite(pos_dict[t_pos], pos_dict[(z,y,x-1)])
+        if (z,y-1,x) in pos_dict:
+            u.unite(pos_dict[t_pos], pos_dict[(z,y-1,x)])
+        if (z,y+1,x) in pos_dict:
+            u.unite(pos_dict[t_pos], pos_dict[(z,y+1,x)])
+        if (z-1,y,x) in pos_dict:
+            u.unite(pos_dict[t_pos], pos_dict[(z-1,y,x)])
+        if (z+1,y,x) in pos_dict:
+            u.unite(pos_dict[t_pos], pos_dict[(z+1,y,x)])
+    if return_suitable_shape:
+        union_lengths = [len(x) for x in u.groups()]
+        max_ind = np.argmax(union_lengths)
+        max_group = u.groups()[max_ind]
+        return_shape = np.zeros_like(input_voxel_array)
+        for ind in max_group:
+            t_pos = pos[ind]
+            return_shape[t_pos] = 1
+        return return_shape
+    else:
+        if len(u.groups()) > 1:
+            return False
+        elif len(u.groups()) == 1:
+            return True
+    
 def validate_shape_by_string(input_voxel_string, input_shape_size):
     """validate the shape by input string
 
@@ -82,7 +122,8 @@ def validate_shape_by_string(input_voxel_string, input_shape_size):
 
 def find_valid_shape_by_string(input_voxel_string, 
                                 input_voxel_shape, 
-                                additional_size):
+                                additional_size,
+                                return_suitable_shape=False):
     """find a valid shape by randomly sample the input voxel template
 
     Args:
@@ -91,12 +132,17 @@ def find_valid_shape_by_string(input_voxel_string,
         additional_size(int): the additional voxel size
     """
     voxel_array = string_to_array(input_voxel_string, input_voxel_shape)
-    while True:
+    if return_suitable_shape:
         base_shape_candidate = generate_base_shape(voxel_array, additional_size)
-        validation = validate_shape(base_shape_candidate)
-        if validation:
-            break
-    return base_shape_candidate
+        shape_array = validate_shape(base_shape_candidate, return_suitable_shape)
+        return shape_array
+    else:
+        while True:
+            base_shape_candidate = generate_base_shape(voxel_array, additional_size)
+            validation = validate_shape(base_shape_candidate)
+            if validation:
+                break
+        return base_shape_candidate
     
 def generate_base_shape(template_shape, voxel_num):
     """generate a base shape by random sampling the viable voxels
@@ -211,3 +257,31 @@ def find_size_by_name(xml, shape_name):
             voxel_string = voxel.text
             voxel_array = string_to_array(voxel_string, (oz, oy, ox))
             return np.sum(voxel_array)
+        
+def shrink_one_piece(xml_file_path):
+    tree = ET.parse(xml_file_path)
+    root = tree.getroot()
+    voxel_list = [x for x in root.iter('voxel')]
+    counter = 0
+    while True:
+        voxel = choice(voxel_list)
+        voxel_dict = voxel.attrib
+        oz = int(voxel_dict['z'])
+        oy = int(voxel_dict['y'])
+        ox = int(voxel_dict['x'])
+        voxel_array = string_to_array(voxel.text, (oz,oy,ox))
+        t_voxel_array = voxel_array.copy()
+        pos = np.argwhere(t_voxel_array == 1)
+        pos = [tuple(x) for x in pos]
+        t_pos = choice(pos)
+        z,y,x = t_pos
+        t_voxel_array[z,y,x] = 0
+        t_string = array_to_string(t_voxel_array)
+        if validate_shape_by_string(''.join(t_string), (oz,oy,ox)):
+            voxel.text = ''.join(t_string)
+            tree.write('./temp2.xml')
+            return True
+        else:
+            counter += 1
+        if counter > 100:
+            return False
