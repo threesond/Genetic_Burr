@@ -34,6 +34,7 @@ for tree in tqdm(xml_list):
     fitness_list.append(fitness)
 
 fitness_list = np.array(fitness_list)
+fitness_list = np.nan_to_num(fitness_list, nan=0)
 iteration = 0
 while True:
     iteration += 1
@@ -77,7 +78,7 @@ while True:
                 xml.write('./temp.xml')
                 output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
                 output = output.split(' ')
-                if output[3] != '0' and output[3] != 'be' and output[3] != 'many':
+                if output[3] != '0' and output[3] != 'be' and output[3] != 'many' and output[3] != 'few':
                     print(output)
                     offspring_list[i] = xml
                     break
@@ -95,5 +96,7 @@ while True:
         # fitness = max(levels)
         fitness = np.mean(levels)
         fitness_list.append(fitness)
+    fitness_list = np.array(fitness_list)
+    fitness_list = np.nan_to_num(fitness_list, nan=0)
     with open('./logs.txt' ,'a') as f:
         f.write(f'current max levels: {max(fitness_list)}\n')
