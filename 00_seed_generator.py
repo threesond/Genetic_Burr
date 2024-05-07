@@ -13,6 +13,13 @@ argParser.add_argument("-c", "--TotalPieces", type=int, help="total count of dis
 
 args = argParser.parse_args()
 
+command = 'rm ./seed/*'
+os.system(command)
+command = 'rm ./results/*'
+os.system(command)
+command = 'rm ./ori_population/*'
+os.system(command)
+
 input_puzzle_template_file = args.Template
 tree = ET.parse(input_puzzle_template_file)
 root = tree.getroot()
@@ -32,6 +39,8 @@ for voxel in root.iter('voxel'):
             oy = int(voxel_dict['y'])
             ox = int(voxel_dict['x'])
             template_string = voxel.text
+            prev_shape_counts = 0
+            stop_counts = 0
             while True:
                 template_shape = string_to_array(template_string, (oz,oy,ox))
                 ori_shape = template_shape.shape
@@ -46,6 +55,8 @@ for voxel in root.iter('voxel'):
                     pos = np.argwhere(template_shape == 2)
                     pos = np.array(pos)
                     pos.shape = (-1)
+                    if len(pos) == 0:
+                        break
                     sampled_pos = choice(list(pos))
                     target_shape[sampled_pos] = 0
                     target_shape.shape = ori_shape
@@ -60,6 +71,13 @@ for voxel in root.iter('voxel'):
                         print(len(pieces_dict[voxel_dict['name']])/args.TotalPieces*100)
                         break
                 if len(pieces_dict[voxel_dict['name']])>args.TotalPieces:
+                    break
+                if len(pieces_dict[voxel_dict['name']])>prev_shape_counts:
+                    prev_shape_counts = len(pieces_dict[voxel_dict['name']])
+                    stop_counts = 0
+                else:
+                    stop_counts += 1
+                if stop_counts > 1000:
                     break
 
 

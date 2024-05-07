@@ -5,12 +5,22 @@ import os
 import numpy as np
 import xml.etree.ElementTree as ET
 from random import choices
-from utils import crossover, mutation, find_size_by_name
+from utils import crossover, find_if_in_list, find_unique_xmls, mutation, find_size_by_name
+from torch.utils.tensorboard import SummaryWriter
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--Template", help="the template path")
+argParser.add_argument("-s", "--ShrinkFrame", action='store_true', help="shrink the frame in mutation")
+argParser.add_argument("-c", "--TotalPices", type=int, help="total piece of population to generate")
 
 args = argParser.parse_args()
+
+command = 'rm -rf ./exp'
+os.system(command)
+
+tb = SummaryWriter(os.path.join('exp', 'tensorboard'))
+command = 'rm ./results/*'
+os.system(command)
 
 ### using more resonable genetic algorithms to generate pieces
 
@@ -39,8 +49,8 @@ iteration = 0
 while True:
     iteration += 1
     sort_indexs = np.argsort(fitness_list)[::-1]
-    with open('./logs.txt' ,'a') as f:
-        f.write(f'current max levels: {max(fitness_list)}\n')
+    # with open('./logs.txt' ,'a') as f:
+    #     f.write(f'current max levels: {max(fitness_list)}\n')
 
     ### select top 10 xml as elite
     elite_xmls = []
@@ -49,10 +59,16 @@ while True:
     ### save the first elite
     elite_xmls[0].write(f'./results/{iteration}.xml')
     ### keep half of the xmls as parents
+    
+    for index in sort_indexs[:10]:
+        fitness_list[index] = fitness_list[index] * 10
 
     prob = fitness_list/np.sum(fitness_list)
+    # temprature = 0.05
+    # exp_list = np.exp(fitness_list/temprature)
+    # prob = exp_list / np.sum(exp_list)
 
-    offsrping_number = 990
+    offsrping_number = args.TotalPices
     offspring_size = 0
     offspring_list = []
     while True:
@@ -62,7 +78,7 @@ while True:
         xml.write('./temp.xml')
         output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
         output = output.split(' ')
-        print(output)
+        # print(output)
         if output[3] != '0':
             offspring_list.append(xml)
             offspring_size += 1
@@ -74,7 +90,7 @@ while True:
         if np.random.uniform(0,1) < 0.2:
             # 20% mutation
             while True:
-                xml = mutation(offspring_list[i], args.Template)
+                xml = mutation(offspring_list[i], args.Template, args.ShrinkFrame)
                 xml.write('./temp.xml')
                 output = os.popen('./bin/burrTxt -d -q ./temp.xml').read()
                 output = output.split(' ')
@@ -82,10 +98,10 @@ while True:
                     print(output)
                     offspring_list[i] = xml
                     break
-
-
+    # offspring_list = find_unique_xmls(offspring_list)
     fitness_list = []
     xml_list = elite_xmls + offspring_list
+    xml_list = find_unique_xmls(xml_list)
     for tree in tqdm(xml_list):
         tree.write('./temp.xml')
         output = os.popen(f'./bin/burrTxt -d ./temp.xml').read()
@@ -98,5 +114,6 @@ while True:
         fitness_list.append(fitness)
     fitness_list = np.array(fitness_list)
     fitness_list = np.nan_to_num(fitness_list, nan=0)
-    with open('./logs.txt' ,'a') as f:
-        f.write(f'current max levels: {max(fitness_list)}\n')
+    tb.add_scalar("MaxLevels", max(fitness_list), iteration)
+    # with open('./logs.txt' ,'a') as f:
+    #     f.write(f'current max levels: {max(fitness_list)}\n')

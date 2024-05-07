@@ -1,7 +1,8 @@
 /.conda
 population/
-temp.xml
 __pycache__/
-__pycache__/utils.cpython-38.pyc
 ori_population/
 results/
+templates/
+seed/
+aug_results/

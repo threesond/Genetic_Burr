@@ -43,6 +43,7 @@ while True:
             levels = [x.replace('level: ', '') for x in levels]
             levels = [sum([int(y) for y in x.split('.')]) for x in levels]
             fitness = np.mean(levels)
+            # fitness = np.max(levels)
             if fitness >= args.Steps:
                 print('augmented 1')
                 save_name = os.path.join('./aug_results', 'result.xml')

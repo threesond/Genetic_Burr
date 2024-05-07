@@ -1,3 +1,4 @@
+from collections import Counter
 import numpy as np
 from random import sample, choice
 from unionfind import unionfind
@@ -192,7 +193,7 @@ def crossover(xml_a, xml_b, template_xml):
                     break
     return template_tree
 
-def mutation(xml, template_xml):
+def mutation(xml, template_xml, shrink_frame):
     """make a mutation to the voxel by adding or removing a voxel randomly
 
     Args:
@@ -219,7 +220,13 @@ def mutation(xml, template_xml):
                     t_pos = choice(pos)
                     z,y,x = t_pos
                     if np.random.uniform(0,1)<0.5:
-                        t_voxel_array[z,y,x] = 0
+                        if name == 'Frame':
+                            if shrink_frame:
+                                t_voxel_array[z,y,x] = 0
+                            else:
+                                pass
+                        else:
+                            t_voxel_array[z,y,x] = 0
                     else:
                         mode = np.random.randint(6)
                         if mode == 0:
@@ -285,3 +292,25 @@ def shrink_one_piece(xml_file_path):
             counter += 1
         if counter > 100:
             return False
+        
+def find_if_in_list(xml_list, xml):
+    xml_string_list = [ET.tostring(x.getroot(), encoding='unicode') for x in xml_list]
+    xml_string = ET.tostring(xml.getroot(), encoding='unicode')
+    return xml_string in xml_string_list
+
+def find_unique_xmls(xml_list):
+    xml_string_list = [ET.tostring(x.getroot(), encoding='unicode') for x in xml_list]
+    c = Counter(xml_string_list)
+    unique_list = []
+    for xml in xml_list:
+        xml_string = ET.tostring(xml.getroot(), encoding='unicode')
+        if c[xml_string] == 1:
+            unique_list.append(xml)
+    counted_list = []
+    for xml in xml_list:
+        xml_string = ET.tostring(xml.getroot(), encoding='unicode')
+        if c[xml_string] > 1:
+            if xml_string not in counted_list:
+                counted_list.append(xml_string)
+                unique_list.append(xml)
+    return unique_list
