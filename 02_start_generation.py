@@ -5,121 +5,82 @@ import os
 import numpy as np
 import xml.etree.ElementTree as ET
 from random import choices, sample
-from utils import crossover, find_if_in_list, find_unique_xmls, mutation, find_size_by_name
+from utils import crossover, find_crossover, find_fitness, find_if_in_list, find_mutation, find_unique_xmls, mutation, find_size_by_name, rotate_islands, sample_tree_from_files
 from torch.utils.tensorboard import SummaryWriter
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--Template", help="the template path")
 argParser.add_argument("-s", "--ShrinkFrame", action='store_true', help="shrink the frame in mutation")
 argParser.add_argument("-c", "--TotalPices", type=int, help="total piece of population to generate")
+argParser.add_argument("-i", "--IslandNumber", type=int, default=1, help="total island number")
 
 args = argParser.parse_args()
 
 command = 'rm -rf ./exp'
 os.system(command)
-
 tb = SummaryWriter(os.path.join('exp', 'tensorboard'))
 command = 'rm ./results/*'
 os.system(command)
 
-### using more resonable genetic algorithms to generate pieces
+ori_xml_files = glob('./ori_population/*.xml')
 
-xml_files = glob('./ori_population/*.xml')
-xml_list = []
-for xml_file in tqdm(xml_files):
-    tree = ET.parse(xml_file)
-    xml_list.append(tree)
+island_list = []
 
-print(len(xml_files))
+for i in range(args.IslandNumber):
+    xml_list = sample_tree_from_files(ori_xml_files, k=100)
+    fitness_list = find_fitness(xml_list)
+    island_list.append({
+        'xml': xml_list,
+        'fitness': fitness_list
+    })
 
-fitness_list = []
-for tree in tqdm(xml_list):
-    tree.write('/mmfs/temp.xml')
-    output = os.popen(f'./bin/burrTxt -d /mmfs/temp.xml').read()
-    output = output.split('-------------------------------------------------------')
-    levels = output[-1].split('\n')[1:-2]
-    levels = [x.replace('level: ','') for x in levels]
-    levels = [sum([int(y) for y in x.split('.')]) for x in levels]
-    fitness = np.mean(levels)
-    fitness_list.append(fitness)
 
-fitness_list = np.array(fitness_list)
-fitness_list = np.nan_to_num(fitness_list, nan=0)
 iteration = 0
 while True:
     iteration += 1
-    sort_indexs = np.argsort(fitness_list)[::-1]
-    # with open('./logs.txt' ,'a') as f:
-    #     f.write(f'current max levels: {max(fitness_list)}\n')
-
-    ### select top 10 xml as elite
-    elite_xmls = []
-    for index in sort_indexs[:2]:
-        elite_xmls.append(xml_list[index])
-    ### save the first elite
-    elite_xmls[0].write(f'./results/{iteration}.xml')
-    ### keep half of the xmls as parents
+    elite_group_list = []
+    for i in range(args.IslandNumber):
+        island_dict = island_list[i]
+        fitness_list = island_dict['fitness']
+        xml_list = island_dict['xml']
+        sort_indexs = np.argsort(fitness_list)[::-1]
+        elite_xmls = []
+        for index in sort_indexs[:2]:
+            elite_xmls.append(xml_list[index])
+        island_dict['elite'] = elite_xmls
+        elite_group_list.append(elite_xmls[0])
     
-    # for index in sort_indexs[:10]:
-    #     fitness_list[index] = fitness_list[index] * 10
-
-    # prob = fitness_list/np.sum(fitness_list)
+    elite_fitness_list = find_fitness(elite_group_list)
+    elite_xml = elite_group_list[np.argmax(elite_fitness_list)]
+    elite_xml.write(f'./results/{iteration}.xml')
     
-    # fitness_mean = np.mean(fitness_list)
-    # fitness_std = np.std(fitness_list)
-    # fitness_list = (fitness_list - fitness_mean) / (fitness_std + 0.00001)
     
-    temprature = 1.
-    exp_list = np.exp(fitness_list/temprature)
-    prob = exp_list / np.sum(exp_list)
+    if iteration % 20 == 0:
+        island_list = rotate_islands(island_list)
+    
+    max_level_list = []
+    for i in range(args.IslandNumber):
+        island_dict = island_list[i]
+        fitness_list = island_dict['fitness']
+        xml_list = island_dict['xml']
+        elite_xmls = island_dict['elite']
+        offspring_list = find_crossover(xml_list, fitness_list, args.TotalPices, args.Template)
+        offspring_list = find_mutation(offspring_list, args.Template, args.ShrinkFrame)
+        xml_list = elite_xmls + offspring_list
+        xml_list = find_unique_xmls(xml_list)
+        fitness_list = find_fitness(xml_list)
+        island_dict['xml'] = xml_list
+        island_dict['fitness'] = fitness_list
+        max_level_list.append(max(fitness_list))
+    tb.add_scalar(f"MaxLevels", max(max_level_list), iteration)
+    tb.add_scalar(f"MinLevels", min(max_level_list), iteration)
+    
+    # elite_xmls[0].write(f'./results/{iteration}.xml')
 
-    offsrping_number = args.TotalPices
-    offspring_size = 0
-    offspring_list = []
-    while True:
-        parent_a = choices(xml_list, weights=prob, k=1)
-        parent_b = choices(xml_list, weights=prob, k=1)
-        xml = crossover(parent_a[0], parent_b[0], args.Template)
-        xml.write('/mmfs/temp.xml')
-        output = os.popen('./bin/burrTxt -d -q /mmfs/temp.xml').read()
-        output = output.split(' ')
-        # print(output)
-        # if output[3] != '0':
-        if output[3] != '0' and output[3] != 'be' and output[3] != 'many' and output[3] != 'few':
-            offspring_list.append(xml)
-            offspring_size += 1
-            if offspring_size > offsrping_number:
-                break
-            print(offspring_size / offsrping_number * 100)
-
-    for i in tqdm(range(len(offspring_list))):
-        if np.random.uniform(0,1) < 0.2:
-            # 20% mutation
-            while True:
-                xml = mutation(offspring_list[i], args.Template, args.ShrinkFrame)
-                xml.write('/mmfs/temp.xml')
-                output = os.popen('./bin/burrTxt -d -q /mmfs/temp.xml').read()
-                output = output.split(' ')
-                if output[3] != '0' and output[3] != 'be' and output[3] != 'many' and output[3] != 'few':
-                    print(output)
-                    offspring_list[i] = xml
-                    break
-    # offspring_list = find_unique_xmls(offspring_list)
-    fitness_list = []
-    xml_list = elite_xmls + offspring_list
-    xml_list = find_unique_xmls(xml_list)
-    for tree in tqdm(xml_list):
-        tree.write('/mmfs/temp.xml')
-        output = os.popen(f'./bin/burrTxt -d /mmfs/temp.xml').read()
-        output = output.split('-------------------------------------------------------')
-        levels = output[-1].split('\n')[1:-2]
-        levels = [x.replace('level: ','') for x in levels]
-        levels = [sum([int(y) for y in x.split('.')]) for x in levels]
-        # fitness = max(levels)
-        fitness = np.mean(levels)
-        fitness_list.append(fitness)
-    fitness_list = np.array(fitness_list)
-    fitness_list = np.nan_to_num(fitness_list, nan=0)
-    tb.add_scalar("MaxLevels", max(fitness_list), iteration)
-    # with open('./logs.txt' ,'a') as f:
-    #     f.write(f'current max levels: {max(fitness_list)}\n')
+    
+    
+    
+    
+    
+    
+    

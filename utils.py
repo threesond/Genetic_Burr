@@ -1,6 +1,7 @@
 from collections import Counter
+import os
 import numpy as np
-from random import sample, choice
+from random import choices, sample, choice
 from unionfind import unionfind
 import xml.etree.ElementTree as ET
 
@@ -314,3 +315,84 @@ def find_unique_xmls(xml_list):
                 counted_list.append(xml_string)
                 unique_list.append(xml)
     return unique_list
+
+def find_fitness(xml_list):
+    fitness_list = []
+    for tree in xml_list:
+        tree.write('/mmfs/temp.xml')
+        output = os.popen(f'./bin/burrTxt -d /mmfs/temp.xml').read()
+        output = output.split('-------------------------------------------------------')
+        levels = output[-1].split('\n')[1:-2]
+        levels = [x.replace('level: ','') for x in levels]
+        levels = [sum([int(y) for y in x.split('.')]) for x in levels]
+        fitness = np.mean(levels)
+        fitness_list.append(fitness)
+    fitness_list = np.array(fitness_list)
+    fitness_list = np.nan_to_num(fitness_list, nan=0)
+    return fitness_list
+
+def find_crossover(xml_list, fitness_list, offspring_number, template):
+    # for index in sort_indexs[:10]:
+    #     fitness_list[index] = fitness_list[index] * 10
+
+    # prob = fitness_list/np.sum(fitness_list)
+    temprature = 0.8
+    exp_list = np.exp(fitness_list/temprature)
+    prob = exp_list / np.sum(exp_list)
+    offspring_size = 0
+    offspring_list = []
+    while True:
+        parent_a = choices(xml_list, weights=prob, k=1)
+        parent_b = choices(xml_list, weights=prob, k=1)
+        xml = crossover(parent_a[0], parent_b[0], template)
+        xml.write('/mmfs/temp.xml')
+        output = os.popen('./bin/burrTxt -d -q /mmfs/temp.xml').read()
+        output = output.split(' ')
+        if output[3] != '0' and output[3] != 'be' and output[3] != 'many' and output[3] != 'few':
+            offspring_list.append(xml)
+            offspring_size += 1
+            if offspring_size > offspring_number:
+                break
+    return offspring_list
+        
+def find_mutation(offspring_list, template, shrink_frame):
+    for i in range(len(offspring_list)):
+        if np.random.uniform(0,1) < 0.2:
+            # 20% mutation
+            while True:
+                xml = mutation(offspring_list[i], template, shrink_frame)
+                xml.write('/mmfs/temp.xml')
+                output = os.popen('./bin/burrTxt -d -q /mmfs/temp.xml').read()
+                output = output.split(' ')
+                if output[3] != '0' and output[3] != 'be' and output[3] != 'many' and output[3] != 'few':
+                    offspring_list[i] = xml
+                    break
+    return offspring_list
+
+def sample_tree_from_files(ori_xml_files, k=100):
+    xml_files = sample(ori_xml_files, k=100)
+    xml_list = []
+    for xml_file in xml_files:
+        tree = ET.parse(xml_file)
+        xml_list.append(tree)
+    return xml_list
+
+def rotate_islands(island_list):
+    for i in range(len(island_list)):
+        island_dict_target = island_list[i]
+        island_dict_source = island_list[i-1]
+        
+        xml_target = island_dict_target['xml']
+        fitness_target = list(island_dict_target['fitness'])
+        
+        xml_source = island_dict_source['xml']
+        fitness_source = list(island_dict_source['fitness'])
+        
+        inds = list(np.random.randint(0,len(fitness_source),5))
+        for j in inds:
+            xml_target.append(xml_source[j])
+            fitness_target.append(fitness_source[j])
+        fitness_target = np.array(fitness_target)
+        island_dict_target['xml'] = xml_target
+        island_dict_target['fitness'] = fitness_target
+    return island_list
