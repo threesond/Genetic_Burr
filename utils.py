@@ -216,7 +216,8 @@ def mutation(xml, template_xml, shrink_frame):
                 pos = np.argwhere(voxel_array == 1)
                 t_voxel_array = voxel_array.copy()
                 pos = [tuple(x) for x in pos]
-                mutation_times = np.random.randint(1,5)
+                # mutation_times = np.random.randint(1,5)
+                mutation_times = 1
                 for _ in range(mutation_times):
                     t_pos = choice(pos)
                     z,y,x = t_pos
@@ -335,10 +336,10 @@ def find_crossover(xml_list, fitness_list, offspring_number, template):
     # for index in sort_indexs[:10]:
     #     fitness_list[index] = fitness_list[index] * 10
 
-    # prob = fitness_list/np.sum(fitness_list)
-    temprature = 0.8
-    exp_list = np.exp(fitness_list/temprature)
-    prob = exp_list / np.sum(exp_list)
+    prob = fitness_list/np.sum(fitness_list)
+    # temprature = 0.1
+    # exp_list = np.exp(fitness_list/temprature)
+    # prob = exp_list / np.sum(exp_list)
     offspring_size = 0
     offspring_list = []
     while True:
@@ -369,8 +370,25 @@ def find_mutation(offspring_list, template, shrink_frame):
                     break
     return offspring_list
 
+def find_population_by_mutation(ori_xml, template, shrink_frame, total_number):
+    count = 0
+    output_list = []
+    while True:
+        xml = mutation(ori_xml, template, shrink_frame)
+        xml.write('/mmfs/temp.xml')
+        output = os.popen('./bin/burrTxt -d -q /mmfs/temp.xml').read()
+        output = output.split(' ')
+        if output[3] != '0' and output[3] != 'be' and output[3] != 'many' and output[3] != 'few':
+            output_list.append(xml)
+            count += 1
+        print(count)
+        if count > total_number:
+            break
+    return output_list
+
 def sample_tree_from_files(ori_xml_files, k=100):
-    xml_files = sample(ori_xml_files, k=100)
+    # xml_files = sample(ori_xml_files, k=100)
+    xml_files = ori_xml_files * 25
     xml_list = []
     for xml_file in xml_files:
         tree = ET.parse(xml_file)

@@ -5,7 +5,7 @@ import os
 import numpy as np
 import xml.etree.ElementTree as ET
 from random import choices, sample
-from utils import crossover, find_crossover, find_fitness, find_if_in_list, find_mutation, find_unique_xmls, mutation, find_size_by_name, rotate_islands, sample_tree_from_files
+from utils import crossover, find_crossover, find_fitness, find_if_in_list, find_mutation, find_population_by_mutation, find_unique_xmls, mutation, find_size_by_name, rotate_islands, sample_tree_from_files
 from torch.utils.tensorboard import SummaryWriter
 
 argParser = argparse.ArgumentParser()
@@ -27,7 +27,9 @@ ori_xml_files = glob('./ori_population/*.xml')
 island_list = []
 
 for i in range(args.IslandNumber):
-    xml_list = sample_tree_from_files(ori_xml_files, k=100)
+    # xml_list = sample_tree_from_files(ori_xml_files, k=100)
+    xml_list = find_population_by_mutation(ET.parse(args.Template), args.Template, args.ShrinkFrame, 100)
+    print(f'initial island {i} generated')
     fitness_list = find_fitness(xml_list)
     island_list.append({
         'xml': xml_list,
