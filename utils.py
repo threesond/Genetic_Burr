@@ -222,7 +222,7 @@ def mutation(xml, template_xml, shrink_frame):
                     t_pos = choice(pos)
                     z,y,x = t_pos
                     if np.random.uniform(0,1)<0.5:
-                        if name == 'Frame':
+                        if 'Frame' in name:
                             if shrink_frame:
                                 t_voxel_array[z,y,x] = 0
                             else:

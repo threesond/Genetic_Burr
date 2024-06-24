@@ -1,0 +1,53 @@
+<puzzle version="2">
+ <gridType type="0" />
+ <colors />
+ <shapes>
+  <voxel x="5" y="5" z="5" name="Frame" type="0">#######_####__####_#######__##___##____#____##_#_##___#____##___##___##___##___#____##___##___##___#######___##___##___######</voxel>
+  <voxel x="5" y="5" z="5" name="Goal" type="0">######+++##+++##+++#######+++##+++##+++##+++##+++##+++##+++##+++##+++##+++##+++##+++##+++##+++##+++#######+++##+++##+++######</voxel>
+  <voxel x="5" y="5" z="5" name="A" type="0">__________________________________#____#____#_______#___##_#_####_______________##___##___#__________________________________</voxel>
+  <voxel x="5" y="5" z="5" name="B" type="0">_______________________________________#____#_____________##____#____#__________####_##___#________________#_________________</voxel>
+ </shapes>
+ <problems>
+  <problem state="2" assemblies="1" solutions="1" time="0">
+   <shapes>
+    <shape id="0" count="1" />
+    <shape id="2" count="1" />
+    <shape id="3" count="1" />
+   </shapes>
+   <result id="1" />
+   <bitmap />
+   <solutions>
+    <solution>
+     <assembly>0 0 0 0 0 0 0 0 4 4 0 10</assembly>
+     <separation>
+      <pieces count="3">0 1 2</pieces>
+      <state>
+       <dx>0 0 4</dx>
+       <dy>0 0 4</dy>
+       <dz>0 0 0</dz>
+      </state>
+      <state>
+       <dx>20000 0 4</dx>
+       <dy>0 0 4</dy>
+       <dz>0 0 0</dz>
+      </state>
+      <separation type="left">
+       <pieces count="2">1 2</pieces>
+       <state>
+        <dx>0 4</dx>
+        <dy>0 4</dy>
+        <dz>0 0</dz>
+       </state>
+       <state>
+        <dx>0 4</dx>
+        <dy>20000 4</dy>
+        <dz>0 0</dz>
+       </state>
+      </separation>
+     </separation>
+    </solution>
+   </solutions>
+  </problem>
+ </problems>
+ <comment />
+</puzzle>

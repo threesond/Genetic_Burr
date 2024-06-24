@@ -11,8 +11,8 @@ from torch.utils.tensorboard import SummaryWriter
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--Template", help="the template path")
 argParser.add_argument("-s", "--ShrinkFrame", action='store_true', help="shrink the frame in mutation")
-argParser.add_argument("-c", "--TotalPices", type=int, help="total piece of population to generate")
-argParser.add_argument("-i", "--IslandNumber", type=int, default=1, help="total island number")
+argParser.add_argument("-c", "--TotalPices", type=int, default=100,  help="total piece of population to generate")
+argParser.add_argument("-i", "--IslandNumber", type=int, default=10, help="total island number")
 
 args = argParser.parse_args()
 
