@@ -2,197 +2,186 @@
  <gridType type="0" />
  <colors />
  <shapes>
-  <voxel x="5" y="5" z="4" name="Goal" type="0">_#____#____#___#####_#____###_#+####+####+++#_###__###_#+####+####+++#_###__#____#____#___#####_#___</voxel>
-  <voxel x="5" y="5" z="4" name="A" type="0">_______________#####____________________##_###___________________#___#____________________#_###_____</voxel>
-  <voxel x="5" y="5" z="4" name="B" type="0">_______________#####____________________#_###____________________#___#____________________#_###_____</voxel>
-  <voxel x="5" y="5" z="4" name="C" type="0">___________________________________###_######_______________#___##___#______________________________</voxel>
-  <voxel x="5" y="5" z="4" name="D" type="0">___________________________________######_###_______________#___##_#_#______________________________</voxel>
+  <voxel x="5" y="5" z="5" name="Goal" type="0">###############################+++##+++##+++############+++##+++##+++############+++##+++##+++###############################</voxel>
+  <voxel x="5" y="5" z="5" name="A" type="0">________________________________________#_#_##___________________###_#___________________####_#____________________#####_____</voxel>
+  <voxel x="5" y="5" z="5" name="B" type="0">________________________________________#___#____________________#__###_##________________#_#_#____________________#####_____</voxel>
+  <voxel x="5" y="5" z="5" name="C" type="0">________________________________________##_##____________________#___#____________________#__##____________________#####_____</voxel>
+  <voxel x="5" y="5" z="5" name="D" type="0">________________________________________##__#____________________#___#____________________#_###____________________#####_____</voxel>
+  <voxel x="5" y="5" z="5" name="Frame" type="0">#_#_##_#_##_#_##_#_##_#_##_#_______###_#__##_#_#_##_#_#_____#___#_____#_#_##_#_#_________#_____#_#_######_____#####_____#####</voxel>
  </shapes>
  <problems>
-  <problem state="2" assemblies="4" solutions="4" time="0">
+  <problem state="2" assemblies="3" solutions="3" time="0">
    <shapes>
     <shape id="1" count="1" />
     <shape id="2" count="1" />
     <shape id="3" count="1" />
     <shape id="4" count="1" />
+    <shape id="5" count="1" />
    </shapes>
    <result id="0" />
    <bitmap />
    <solutions>
-    <solution asmNum="1" solNum="1">
-     <assembly>0 0 0 0 4 4 3 22 0 4 3 2 5 0 0 16</assembly>
-     <separation>
-      <pieces count="4">0 1 2 3</pieces>
-      <state>
-       <dx>0 4 0 5</dx>
-       <dy>0 4 4 0</dy>
-       <dz>0 3 3 0</dz>
-      </state>
-      <state>
-       <dx>0 4 0 5</dx>
-       <dy>0 4 4 0</dy>
-       <dz>0 20003 20003 0</dz>
-      </state>
-      <separation type="removed">
-       <pieces count="2">1 2</pieces>
-       <state>
-        <dx>4 0</dx>
-        <dy>4 4</dy>
-        <dz>3 3</dz>
-       </state>
-       <state>
-        <dx>20004 0</dx>
-        <dy>4 4</dy>
-        <dz>3 3</dz>
-       </state>
-      </separation>
-      <separation type="left">
-       <pieces count="2">0 3</pieces>
-       <state>
-        <dx>0 5</dx>
-        <dy>0 0</dy>
-        <dz>0 0</dz>
-       </state>
-       <state>
-        <dx>0 5</dx>
-        <dy>20000 0</dy>
-        <dz>0 0</dz>
-       </state>
-      </separation>
-     </separation>
-    </solution>
-    <solution asmNum="2" solNum="2">
-     <assembly>0 0 0 0 4 4 3 22 5 0 0 16 0 4 3 2</assembly>
-     <separation>
-      <pieces count="4">0 1 2 3</pieces>
-      <state>
-       <dx>0 4 5 0</dx>
-       <dy>0 4 0 4</dy>
-       <dz>0 3 0 3</dz>
-      </state>
-      <state>
-       <dx>0 4 5 0</dx>
-       <dy>0 4 0 4</dy>
-       <dz>0 20003 0 20003</dz>
-      </state>
-      <separation type="removed">
-       <pieces count="2">1 3</pieces>
-       <state>
-        <dx>4 0</dx>
-        <dy>4 4</dy>
-        <dz>3 3</dz>
-       </state>
-       <state>
-        <dx>20004 0</dx>
-        <dy>4 4</dy>
-        <dz>3 3</dz>
-       </state>
-      </separation>
-      <separation type="left">
-       <pieces count="2">0 2</pieces>
-       <state>
-        <dx>0 5</dx>
-        <dy>0 0</dy>
-        <dz>0 0</dz>
-       </state>
-       <state>
-        <dx>0 5</dx>
-        <dy>20000 0</dy>
-        <dz>0 0</dz>
-       </state>
-      </separation>
-     </separation>
-    </solution>
     <solution>
-     <assembly>0 0 0 0 4 4 3 22 0 -1 0 0 0 0 3 18</assembly>
+     <assembly>0 -2 0 0 0 0 0 0 -2 0 4 18 0 0 4 18 0 0 0 0</assembly>
      <separation>
-      <pieces count="4">0 1 2 3</pieces>
+      <pieces count="5">0 1 2 3 4</pieces>
       <state>
-       <dx>0 4 0 0</dx>
-       <dy>0 4 -1 0</dy>
-       <dz>0 3 0 3</dz>
+       <dx>0 0 -2 0 0</dx>
+       <dy>-2 0 0 0 0</dy>
+       <dz>0 0 4 4 0</dz>
       </state>
       <state>
-       <dx>0 4 0 0</dx>
-       <dy>0 4 -1 0</dy>
-       <dz>2 3 0 5</dz>
-      </state>
-      <state>
-       <dx>0 4 20000 0</dx>
-       <dy>0 4 -1 0</dy>
-       <dz>2 3 0 5</dz>
+       <dx>20000 0 -2 0 0</dx>
+       <dy>-2 0 0 0 0</dy>
+       <dz>0 0 4 4 0</dz>
       </state>
       <separation type="left">
-       <pieces count="3">0 1 3</pieces>
+       <pieces count="4">1 2 3 4</pieces>
        <state>
-        <dx>0 4 0</dx>
-        <dy>0 4 0</dy>
-        <dz>2 3 5</dz>
+        <dx>0 -2 0 0</dx>
+        <dy>0 0 0 0</dy>
+        <dz>0 4 4 0</dz>
        </state>
        <state>
-        <dx>0 4 0</dx>
-        <dy>0 4 20000</dy>
-        <dz>2 3 5</dz>
+        <dx>20000 -2 0 0</dx>
+        <dy>0 0 0 0</dy>
+        <dz>0 4 4 0</dz>
        </state>
        <separation type="left">
-        <pieces count="2">0 1</pieces>
+        <pieces count="3">2 3 4</pieces>
         <state>
-         <dx>0 4</dx>
-         <dy>0 4</dy>
-         <dz>2 3</dz>
+         <dx>-2 0 0</dx>
+         <dy>0 0 0</dy>
+         <dz>4 4 0</dz>
         </state>
         <state>
-         <dx>0 4</dx>
-         <dy>0 4</dy>
-         <dz>2 20003</dz>
+         <dx>-2 0 0</dx>
+         <dy>20000 0 0</dy>
+         <dz>4 4 0</dz>
         </state>
+        <separation type="left">
+         <pieces count="2">3 4</pieces>
+         <state>
+          <dx>0 0</dx>
+          <dy>0 0</dy>
+          <dz>4 0</dz>
+         </state>
+         <state>
+          <dx>0 0</dx>
+          <dy>20000 0</dy>
+          <dz>4 0</dz>
+         </state>
+        </separation>
        </separation>
       </separation>
      </separation>
     </solution>
-    <solution asmNum="3" solNum="3">
-     <assembly>0 0 0 0 4 4 3 22 0 0 3 18 0 -1 0 0</assembly>
+    <solution asmNum="1" solNum="1">
+     <assembly>0 -2 0 0 -2 0 4 18 0 0 0 0 0 0 4 18 0 0 0 0</assembly>
      <separation>
-      <pieces count="4">0 1 2 3</pieces>
+      <pieces count="5">0 1 2 3 4</pieces>
       <state>
-       <dx>0 4 0 0</dx>
-       <dy>0 4 0 -1</dy>
-       <dz>0 3 3 0</dz>
+       <dx>0 -2 0 0 0</dx>
+       <dy>-2 0 0 0 0</dy>
+       <dz>0 4 0 4 0</dz>
       </state>
       <state>
-       <dx>0 4 0 0</dx>
-       <dy>0 4 0 -1</dy>
-       <dz>2 3 5 0</dz>
-      </state>
-      <state>
-       <dx>0 4 0 20000</dx>
-       <dy>0 4 0 -1</dy>
-       <dz>2 3 5 0</dz>
+       <dx>20000 -2 0 0 0</dx>
+       <dy>-2 0 0 0 0</dy>
+       <dz>0 4 0 4 0</dz>
       </state>
       <separation type="left">
-       <pieces count="3">0 1 2</pieces>
+       <pieces count="4">1 2 3 4</pieces>
        <state>
-        <dx>0 4 0</dx>
-        <dy>0 4 0</dy>
-        <dz>2 3 5</dz>
+        <dx>-2 0 0 0</dx>
+        <dy>0 0 0 0</dy>
+        <dz>4 0 4 0</dz>
        </state>
        <state>
-        <dx>0 4 0</dx>
-        <dy>0 4 20000</dy>
-        <dz>2 3 5</dz>
+        <dx>-2 20000 0 0</dx>
+        <dy>0 0 0 0</dy>
+        <dz>4 0 4 0</dz>
        </state>
        <separation type="left">
-        <pieces count="2">0 1</pieces>
+        <pieces count="3">1 3 4</pieces>
         <state>
-         <dx>0 4</dx>
-         <dy>0 4</dy>
-         <dz>2 3</dz>
+         <dx>-2 0 0</dx>
+         <dy>0 0 0</dy>
+         <dz>4 4 0</dz>
         </state>
         <state>
-         <dx>0 4</dx>
-         <dy>0 4</dy>
-         <dz>2 20003</dz>
+         <dx>-2 0 0</dx>
+         <dy>20000 0 0</dy>
+         <dz>4 4 0</dz>
         </state>
+        <separation type="left">
+         <pieces count="2">3 4</pieces>
+         <state>
+          <dx>0 0</dx>
+          <dy>0 0</dy>
+          <dz>4 0</dz>
+         </state>
+         <state>
+          <dx>0 0</dx>
+          <dy>20000 0</dy>
+          <dz>4 0</dz>
+         </state>
+        </separation>
+       </separation>
+      </separation>
+     </separation>
+    </solution>
+    <solution asmNum="2" solNum="2">
+     <assembly>0 -2 0 0 -2 0 4 18 0 0 4 18 0 0 0 0 0 0 0 0</assembly>
+     <separation>
+      <pieces count="5">0 1 2 3 4</pieces>
+      <state>
+       <dx>0 -2 0 0 0</dx>
+       <dy>-2 0 0 0 0</dy>
+       <dz>0 4 4 0 0</dz>
+      </state>
+      <state>
+       <dx>20000 -2 0 0 0</dx>
+       <dy>-2 0 0 0 0</dy>
+       <dz>0 4 4 0 0</dz>
+      </state>
+      <separation type="left">
+       <pieces count="4">1 2 3 4</pieces>
+       <state>
+        <dx>-2 0 0 0</dx>
+        <dy>0 0 0 0</dy>
+        <dz>4 4 0 0</dz>
+       </state>
+       <state>
+        <dx>-2 0 20000 0</dx>
+        <dy>0 0 0 0</dy>
+        <dz>4 4 0 0</dz>
+       </state>
+       <separation type="left">
+        <pieces count="3">1 2 4</pieces>
+        <state>
+         <dx>-2 0 0</dx>
+         <dy>0 0 0</dy>
+         <dz>4 4 0</dz>
+        </state>
+        <state>
+         <dx>-2 0 0</dx>
+         <dy>20000 0 0</dy>
+         <dz>4 4 0</dz>
+        </state>
+        <separation type="left">
+         <pieces count="2">2 4</pieces>
+         <state>
+          <dx>0 0</dx>
+          <dy>0 0</dy>
+          <dz>4 0</dz>
+         </state>
+         <state>
+          <dx>0 0</dx>
+          <dy>20000 0</dy>
+          <dz>4 0</dz>
+         </state>
+        </separation>
        </separation>
       </separation>
      </separation>
