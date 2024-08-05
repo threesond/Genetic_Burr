@@ -194,6 +194,55 @@ def crossover(xml_a, xml_b, template_xml):
                     break
     return template_tree
 
+def up_mutation(xml, template_xml):
+    """make a mutation to the voxel by adding or removing a voxel randomly
+
+    Args:
+        xml (xml tree): the input candidate
+    """
+    root = xml.getroot()
+    template_tree = ET.parse(template_xml)
+    template_root = template_tree.getroot()
+    for voxel, voxel_template in zip(root.iter('voxel'), template_root.iter('voxel')):
+        voxel_string = voxel.text
+        voxel_dict = voxel.attrib
+        oz = int(voxel_dict['z'])
+        oy = int(voxel_dict['y'])
+        ox = int(voxel_dict['x'])
+        name = voxel_dict['name']
+        if name != 'Goal':
+            voxel_array = string_to_array(voxel_string, (oz,oy,ox))
+            while True:
+                pos = np.argwhere(voxel_array == 1)
+                t_voxel_array = voxel_array.copy()
+                pos = [tuple(x) for x in pos]
+                # mutation_times = np.random.randint(1,5)
+                mutation_times = 1
+                for _ in range(mutation_times):
+                    t_pos = choice(pos)
+                    z,y,x = t_pos
+                    if np.random.uniform(0,1)<0.4:
+                        t_voxel_array[z,y,x] = 0
+                    else:
+                        mode = np.random.randint(6)
+                        if mode == 0:
+                            t_voxel_array[z,y,x-1] = 1
+                        if mode == 1:
+                            t_voxel_array[z,y,np.minimum(x+1,ox-1)] = 1
+                        if mode == 2:
+                            t_voxel_array[z,y-1,x] = 1
+                        if mode == 3:
+                            t_voxel_array[z,np.minimum(y+1,oy-1),x] = 1
+                        if mode == 4:
+                            t_voxel_array[z-1,y,x] = 1
+                        if mode == 5:
+                            t_voxel_array[np.minimum(z+1,oz-1),y,x] = 1
+                t_string = array_to_string(t_voxel_array)
+                if validate_shape_by_string(''.join(t_string), (oz,oy,ox)):
+                    voxel_template.text = ''.join(t_string)
+                    break
+    return template_tree
+
 def mutation(xml, template_xml, shrink_frame):
     """make a mutation to the voxel by adding or removing a voxel randomly
 
